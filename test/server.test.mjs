@@ -55,7 +55,7 @@ test('taps arrive as channel messages, cards and status reach the relay', async 
     assert.equal(good.isError, undefined)
     assert.equal(got.answer.at(-1).title, 'Today')
     // ...and closed the task when the card went out, though the model never called status done.
-    assert.equal(got.status.at(-1).mode, 'idle')
+    assert.equal(got.status.at(-1).mode, 'done')
     assert.equal(got.status.at(-1).now, 'Today')
     assert.deepEqual(got.status.at(-1).steps, ['Picked up TODAY'])
 

@@ -1,7 +1,7 @@
 {
   "name": "mortimer",
   "description": "Your agent on your phone's home screen: live status, tiles, answer cards and approvals, plus the workflows behind them. Tiles unlock as you connect tools.",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "author": { "name": "Canonbury Labs" },
   "keywords": ["phone", "widget", "channel", "agent", "mcp"]
 }
