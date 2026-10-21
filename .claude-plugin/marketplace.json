@@ -1,0 +1,6 @@
+{
+  "name": "mortimer",
+  "description": "Mortimer: your Claude Code agent on your Android home screen.",
+  "owner": { "name": "Canonbury Labs" },
+  "plugins": [{ "name": "mortimer", "source": "./", "description": "Mortimer phone widget channel plus core workflows." }]
+}
