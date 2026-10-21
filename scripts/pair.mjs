@@ -8,12 +8,14 @@
 // --wait N: after printing the code, keep checking for up to N seconds until a phone claims it.
 // --check N: issue no new code; wait up to N seconds for a phone to claim the last code printed (exit 0 paired, 2 not yet).
 // --new: start a fresh account.
+// --no-open: don't open the pairing page in the browser (it opens by default on a desktop).
 // --invite CODE: one-time invite code for sign-up (or env MORTIMER_INVITE).
 // Env: MORTIMER_DIR (default ~/.mortimer), MORTIMER_RELAY (default relay URL), MORTIMER_INVITE (invite token
 // if the relay requires one).
 import { readFileSync, writeFileSync, mkdirSync, renameSync, existsSync } from 'fs'
 import { homedir } from 'os'
 import { join } from 'path'
+import { spawn } from 'child_process'
 
 // Set to the hosted relay's https URL once it is deployed (alfred-relay). Empty until then.
 const DEFAULT_RELAY = 'https://alfred-relay-mu.vercel.app'
@@ -52,6 +54,13 @@ async function call(base, op, { key, body, invite } = {}) {
   let data = {}
   try { data = JSON.parse(text || '{}') } catch { /* not json */ }
   return { status: r.status, data }
+}
+
+function openPage(url) {
+  const cmd = process.platform === 'darwin' ? ['open', [url]] : process.platform === 'win32' ? ['cmd', ['/c', 'start', '', url]]
+    : (process.env.DISPLAY || process.env.WAYLAND_DISPLAY) ? ['xdg-open', [url]] : null
+  if (!cmd) return false
+  try { spawn(cmd[0], cmd[1], { detached: true, stdio: 'ignore' }).on('error', () => {}).unref(); return true } catch { return false }
 }
 
 const clean = u => String(u || '').trim().replace(/\/+$/, '')
@@ -114,5 +123,7 @@ const exp = new Date(pairing.expires_at)
 out(`Pairing code: ${pairing.code} (one use, expires ${exp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })})`)
 out(`Pairing link: ${pairing.url}`)
 out(`QR code: ${join(DIR, 'pair-qr.svg')} (or open the link on this computer and scan it with the phone)`)
+// Open the pairing page (big QR) in the browser, so the user only has to scan. Skipped on servers with no desktop.
+if (!flag('no-open') && openPage(pairing.url)) out('Opened the pairing page in the browser: scan its QR with the phone.')
 
 if (Number(opt('wait', 0)) > 0) await waitFor(Number(opt('wait')), issued)

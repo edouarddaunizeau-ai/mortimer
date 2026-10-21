@@ -1,6 +1,6 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { toMessage, checkCard, frontmatter, requiresOf, tiles, phoneFlows, Status } from '../lib/core.mjs'
+import { pickedUp, toMessage, checkCard, frontmatter, requiresOf, tiles, phoneFlows, Status } from '../lib/core.mjs'
 
 test('taps become one clean line', () => {
   assert.equal(toMessage({ id: 'abcdefgh', cmd: 'today' }).content, '/today')
@@ -81,4 +81,10 @@ test('every skill has valid frontmatter, a tap command and a phone card', async 
   assert.equal(toMessage({ id: 'abcdefgh', cmd: 'fit' }).content, '/fit')
   assert.equal(toMessage({ id: 'abcdefgh', cmd: 'trip', text: 'Lisbon 14-17 Nov' }).content, '/trip Lisbon 14-17 Nov')
   assert.equal(toMessage({ id: 'abcdefgh', cmd: 'weekends' }).content, '/weekends')
+})
+
+test('first live step names the tile, or says it is reading typed text', () => {
+  assert.equal(pickedUp('/today'), 'Picked up TODAY')
+  assert.equal(pickedUp('/trip Paris in May'), 'Picked up TRIP')
+  assert.equal(pickedUp('what is on tomorrow'), 'Reading your message')
 })

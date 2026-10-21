@@ -48,9 +48,16 @@ test('taps arrive as channel messages, cards and status reach the relay', async 
 
     const bad = await client.callTool({ name: 'card', arguments: { title: 'x', chips: [{ label: 'WAY TOO LONG A LABEL', send: 'y' }] } })
     assert.equal(bad.isError, true)
+    // The server posted the first live step itself when it handed over the tap.
+    assert.equal(got.status[0].now, 'Picked up TODAY')
+    assert.equal(got.status[0].mode, 'active')
     const good = await client.callTool({ name: 'card', arguments: { title: 'Today', lines: ['19:30 Dinner'], chips: [{ label: 'TODO', send: '/todo' }] } })
     assert.equal(good.isError, undefined)
     assert.equal(got.answer.at(-1).title, 'Today')
+    // ...and closed the task when the card went out, though the model never called status done.
+    assert.equal(got.status.at(-1).mode, 'idle')
+    assert.equal(got.status.at(-1).now, 'Today')
+    assert.deepEqual(got.status.at(-1).steps, ['Picked up TODAY'])
 
     await client.callTool({ name: 'status', arguments: { action: 'set', text: 'Checking calendar' } })
     assert.equal(got.status.at(-1).now, 'Checking calendar')

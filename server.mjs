@@ -11,7 +11,7 @@ import { readFileSync, writeFileSync, mkdirSync, readdirSync, existsSync } from 
 import { homedir } from 'os'
 import { join, dirname } from 'path'
 import { fileURLToPath } from 'url'
-import { toMessage, checkCard, cardBody, frontmatter, requiresOf, tiles, phoneFlows, Status } from './lib/core.mjs'
+import { toMessage, checkCard, cardBody, frontmatter, requiresOf, tiles, phoneFlows, pickedUp, Status } from './lib/core.mjs'
 
 const ROOT = dirname(fileURLToPath(import.meta.url))
 const DIR = process.env.MORTIMER_DIR || join(homedir(), '.mortimer')
@@ -118,6 +118,8 @@ mcp.setRequestHandler(CallToolRequestSchema, async req => {
       const errs = checkCard(a)
       if (errs.length) return fail(`Card not sent: ${errs.join('; ')}`)
       await relay('answer', cardBody(a))
+      // The card is the answer: if the task is still showing as running, close it so the widget never sticks on a step.
+      if (status.mode === 'active') await relay('status', status.done(a.title)).catch(e => log(e.message))
       return ok('Card sent.')
     }
     if (req.params.name === 'status') {
@@ -158,7 +160,8 @@ async function poll() {
       const m = toMessage(c)
       if (!m) { log(`dropped a '${String(c?.cmd).slice(0, 20)}' tap`); continue }
       await mcp.notification({ method: 'notifications/claude/channel', params: { content: m.content, meta: m.meta } })
-      await relay('status', { now: 'Picked up your tap', steps: [], times: [Date.now()], mode: 'active' }).catch(() => {})
+      // The first step is ours, so the phone moves the moment the session has the tap, whatever the model does next.
+      await relay('status', status.set(pickedUp(m.content))).catch(() => {})
     }
   } catch (e) {
     log(`poll failed: ${e.message}`)
