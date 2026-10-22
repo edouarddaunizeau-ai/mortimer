@@ -6,6 +6,11 @@
     "name": "Canonbury Labs"
   },
   "license": "MIT",
+  "homepage": "https://heymortimer.com",
+  "repository": "https://github.com/edouarddaunizeau-ai/mortimer",
+  "documentationUrl": "https://github.com/edouarddaunizeau-ai/mortimer#readme",
+  "privacyPolicyUrl": "https://heymortimer.com/privacy",
+  "supportUrl": "https://github.com/edouarddaunizeau-ai/mortimer/issues",
   "keywords": [
     "phone",
     "widget",
