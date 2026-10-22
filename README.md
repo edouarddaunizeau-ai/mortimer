@@ -31,4 +31,13 @@ Keep that Claude Code session running: it is what the widget talks to.
 
 User data lives in `~/.mortimer/` (profile.md, caps.json, todo.md, link.env with mode 600, plus watches.json, alerts.md, subscriptions.md, fit.md, fit-log.md and gtm/ as those skills are used).
 
+## Data and outside services
+
+Besides the connectors you choose (Gmail, Calendar, GitHub, Vercel), the plugin talks to two outside services:
+
+- The Mortimer relay (https://alfred-relay-mu.vercel.app, hosted on Vercel). It carries what passes between your phone and your Claude Code session: taps and messages from the phone, and the answer cards and live status your agent sends back. Phone requests are signed with a key that stays on the phone. A queued tap is deleted once your agent picks it up. The latest card and status are kept so the widget can show them, until they are replaced or you delete your account. Override with `MORTIMER_RELAY`.
+- Web pages you ask the watch skill to monitor. They are fetched from your computer, and nothing about them is sent anywhere else.
+
+Everything else stays on your computer in `~/.mortimer/`. Privacy policy: https://heymortimer.com/privacy
+
 Testing in a separate Claude session on a machine that also runs a Telegram channel session: disable the Telegram plugin for the test session, or its poller replaces the live one.
